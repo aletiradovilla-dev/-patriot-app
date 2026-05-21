@@ -5,6 +5,7 @@ import {
   ActivityIndicator, Linking, RefreshControl, SafeAreaView, ScrollView,
   StyleSheet, Text, TouchableOpacity, View
 } from 'react-native';
+import { useProfile } from '../../hooks/useProfile';
 import { supabase } from '../../lib/supabase';
 
 const WHATSAPP = '527225592758';
@@ -26,6 +27,7 @@ export default function EmptyLegsScreen() {
   const [vuelos, setVuelos] = useState<EmptyLeg[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const profile = useProfile();
 
   const fetchVuelos = async () => {
     const { data } = await supabase
@@ -55,7 +57,7 @@ export default function EmptyLegsScreen() {
       ? `$${vuelo.precio_asiento.toLocaleString()} USD por asiento`
       : `$${vuelo.precio_cabina.toLocaleString()} USD cabina completa`;
 
-    const msg = `✈️ *Reserva de Empty Leg - Patriot Aviation*\n\n*Ruta:* ${vuelo.origen} → ${vuelo.destino}\n*Fecha:* ${vuelo.fecha}\n*Hora:* ${vuelo.hora}\n*Aeronave:* ${vuelo.aeronave}\n*Pasajeros:* ${vuelo.asientos} pax\n*Opción:* ${precio}\n\n_Me interesa reservar este vuelo._`;
+    const msg = `✈️ *Reserva de Empty Leg - Patriot Aviation*\n\n*Cliente:* ${profile.nombre || 'No registrado'}\n*Email:* ${profile.email}\n*Teléfono:* ${profile.telefono || 'No registrado'}\n*Ruta:* ${vuelo.origen} → ${vuelo.destino}\n*Fecha:* ${vuelo.fecha}\n*Hora:* ${vuelo.hora}\n*Aeronave:* ${vuelo.aeronave}\n*Pasajeros:* ${vuelo.asientos} pax\n*Opción:* ${precio}\n\n_Me interesa reservar este vuelo._`;
 
     Linking.openURL(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`);
   };
@@ -87,20 +89,15 @@ export default function EmptyLegsScreen() {
           ) : (
             vuelos.map((vuelo) => (
               <View key={vuelo.id} style={styles.card}>
-                {/* RUTA */}
                 <View style={styles.ruta}>
                   <Text style={styles.ciudad}>{vuelo.origen}</Text>
                   <Text style={styles.flecha}>→</Text>
                   <Text style={styles.ciudad}>{vuelo.destino}</Text>
                 </View>
-
-                {/* INFO */}
                 <View style={styles.info}>
                   <Text style={styles.infoText}>{vuelo.fecha} · {vuelo.hora}</Text>
                   <Text style={styles.infoText}>{vuelo.aeronave} · {vuelo.asientos} pax</Text>
                 </View>
-
-                {/* PRECIOS */}
                 <View style={styles.precios}>
                   <View>
                     <Text style={styles.precioLabel}>Por asiento</Text>
@@ -111,8 +108,6 @@ export default function EmptyLegsScreen() {
                     <Text style={styles.precio}>${vuelo.precio_cabina.toLocaleString()} USD</Text>
                   </View>
                 </View>
-
-                {/* BOTONES WHATSAPP */}
                 <View style={styles.btnRow}>
                   <TouchableOpacity
                     style={styles.btnWA}

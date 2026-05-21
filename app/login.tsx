@@ -12,6 +12,7 @@ export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [nombre, setNombre] = useState('');
+  const [telefono, setTelefono] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
@@ -21,9 +22,25 @@ export default function LoginScreen() {
     }
     setLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) Alert.alert('Error', error.message);
-      else router.replace('/(tabs)/home');
+      else {
+        if (data.user) {
+          const { data: perfil } = await supabase
+            .from('perfiles')
+            .select('id')
+            .eq('id', data.user.id)
+            .single();
+          if (!perfil) {
+            await supabase.from('perfiles').upsert({
+              id: data.user.id,
+              nombre: data.user.user_metadata?.full_name || '',
+              updated_at: new Date().toISOString(),
+            });
+          }
+        }
+        router.replace('/(tabs)/home');
+      }
     } catch (e: any) {
       Alert.alert('Error', e.message);
     } finally {
@@ -32,7 +49,7 @@ export default function LoginScreen() {
   };
 
   const handleRegistro = async () => {
-    if (!email || !password || !nombre) {
+    if (!email || !password || !nombre || !telefono) {
       Alert.alert('Error', 'Completa todos los campos');
       return;
     }
@@ -42,14 +59,22 @@ export default function LoginScreen() {
     }
     setLoading(true);
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: { data: { full_name: nombre } }
       });
       if (error) Alert.alert('Error', error.message);
       else {
-        Alert.alert('¡Cuenta creada!', 'Revisa tu correo para verificar tu cuenta.', [
+        if (data.user) {
+          await supabase.from('perfiles').upsert({
+            id: data.user.id,
+            nombre,
+            telefono,
+            updated_at: new Date().toISOString(),
+          });
+        }
+        Alert.alert('¡Cuenta creada!', 'Ya puedes iniciar sesión.', [
           { text: 'OK', onPress: () => setModo('login') }
         ]);
       }
@@ -89,7 +114,6 @@ export default function LoginScreen() {
       <SafeAreaView style={styles.safe}>
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.inner}>
 
-          {/* LOGO */}
           <View style={styles.logoContainer}>
             <Text style={styles.logoText}>Patriot</Text>
             <Text style={styles.logoSub}>AVIATION</Text>
@@ -97,7 +121,6 @@ export default function LoginScreen() {
             <Text style={styles.tagline}>EXECUTIVE AVIATION</Text>
           </View>
 
-          {/* TABS */}
           {modo !== 'forgot' && (
             <View style={styles.modoRow}>
               <TouchableOpacity
@@ -119,7 +142,6 @@ export default function LoginScreen() {
             </View>
           )}
 
-          {/* FORM LOGIN */}
           {modo === 'login' && (
             <View style={styles.form}>
               <TextInput style={styles.input} placeholder="Correo electrónico" placeholderTextColor="rgba(255,255,255,0.4)" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" />
@@ -133,10 +155,10 @@ export default function LoginScreen() {
             </View>
           )}
 
-          {/* FORM REGISTRO */}
           {modo === 'registro' && (
             <View style={styles.form}>
               <TextInput style={styles.input} placeholder="Nombre completo" placeholderTextColor="rgba(255,255,255,0.4)" value={nombre} onChangeText={setNombre} autoCapitalize="words" />
+              <TextInput style={styles.input} placeholder="Teléfono" placeholderTextColor="rgba(255,255,255,0.4)" value={telefono} onChangeText={setTelefono} keyboardType="phone-pad" />
               <TextInput style={styles.input} placeholder="Correo electrónico" placeholderTextColor="rgba(255,255,255,0.4)" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" />
               <TextInput style={styles.input} placeholder="Contraseña (mín. 6 caracteres)" placeholderTextColor="rgba(255,255,255,0.4)" value={password} onChangeText={setPassword} secureTextEntry />
               <TouchableOpacity style={styles.btn} onPress={handleRegistro} disabled={loading}>
@@ -145,7 +167,6 @@ export default function LoginScreen() {
             </View>
           )}
 
-          {/* FORM FORGOT */}
           {modo === 'forgot' && (
             <View style={styles.form}>
               <Text style={styles.forgotTitle}>Recuperar contraseña</Text>
@@ -168,7 +189,7 @@ export default function LoginScreen() {
 
 const styles = StyleSheet.create({
   bg: { flex: 1 },
-  overlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(13,27,42,0.89)' },
+  overlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(13,27,42,0.85)' },
   safe: { flex: 1 },
   inner: { flex: 1, justifyContent: 'center', paddingHorizontal: 32 },
   logoContainer: { alignItems: 'center', marginBottom: 40 },

@@ -1,9 +1,9 @@
-import { router } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { router, useFocusEffect } from 'expo-router';
+import { useCallback, useState } from 'react';
 import {
-    ActivityIndicator, Alert, SafeAreaView,
-    ScrollView, StyleSheet, Text,
-    TextInput, TouchableOpacity, View
+  ActivityIndicator, Alert, SafeAreaView,
+  ScrollView, StyleSheet, Text,
+  TextInput, TouchableOpacity, View
 } from 'react-native';
 import { supabase } from '../../lib/supabase';
 
@@ -16,16 +16,12 @@ export default function PerfilScreen() {
   const [telefono, setTelefono] = useState('');
   const [empresa, setEmpresa] = useState('');
 
-  useEffect(() => {
-    fetchPerfil();
-  }, []);
-
   const fetchPerfil = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
     setEmail(user.email || '');
 
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('perfiles')
       .select('*')
       .eq('id', user.id)
@@ -39,12 +35,19 @@ export default function PerfilScreen() {
     setLoading(false);
   };
 
+  useFocusEffect(
+    useCallback(() => {
+      setLoading(true);
+      fetchPerfil();
+    }, [])
+  );
+
   const handleSave = async () => {
     setSaving(true);
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    await supabase.from('perfiles').upsert({
+    const { error } = await supabase.from('perfiles').upsert({
       id: user.id,
       nombre,
       telefono,
@@ -53,8 +56,13 @@ export default function PerfilScreen() {
     });
 
     setSaving(false);
-    setEditing(false);
-    Alert.alert('Guardado', 'Perfil actualizado correctamente');
+
+    if (error) {
+      Alert.alert('Error', error.message);
+    } else {
+      setEditing(false);
+      Alert.alert('Guardado', 'Perfil actualizado correctamente');
+    }
   };
 
   const handleLogout = async () => {
@@ -81,13 +89,35 @@ export default function PerfilScreen() {
           </View>
 
           <Text style={styles.label}>Nombre</Text>
-          <TextInput style={[styles.input, !editing && styles.inputReadonly]} value={nombre} onChangeText={setNombre} editable={editing} placeholder="Tu nombre" placeholderTextColor="#444" />
+          <TextInput
+            style={[styles.input, !editing && styles.inputReadonly]}
+            value={nombre}
+            onChangeText={setNombre}
+            editable={editing}
+            placeholder="Tu nombre"
+            placeholderTextColor="#444"
+          />
 
           <Text style={styles.label}>Teléfono</Text>
-          <TextInput style={[styles.input, !editing && styles.inputReadonly]} value={telefono} onChangeText={setTelefono} editable={editing} placeholder="Tu teléfono" placeholderTextColor="#444" keyboardType="phone-pad" />
+          <TextInput
+            style={[styles.input, !editing && styles.inputReadonly]}
+            value={telefono}
+            onChangeText={setTelefono}
+            editable={editing}
+            placeholder="Tu teléfono"
+            placeholderTextColor="#444"
+            keyboardType="phone-pad"
+          />
 
           <Text style={styles.label}>Empresa</Text>
-          <TextInput style={[styles.input, !editing && styles.inputReadonly]} value={empresa} onChangeText={setEmpresa} editable={editing} placeholder="Tu empresa" placeholderTextColor="#444" />
+          <TextInput
+            style={[styles.input, !editing && styles.inputReadonly]}
+            value={empresa}
+            onChangeText={setEmpresa}
+            editable={editing}
+            placeholder="Tu empresa"
+            placeholderTextColor="#444"
+          />
         </View>
 
         {editing ? (

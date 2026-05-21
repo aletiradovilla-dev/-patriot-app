@@ -21,43 +21,14 @@ export default function TabLayout() {
       tabBarLabelStyle: { fontSize: 9, fontWeight: '600', marginTop: 2 },
       tabBarItemStyle: { width: TAB_WIDTH },
     }}>
-      <Tabs.Screen
-        name="home"
-        options={{
-          title: 'HOME',
-          tabBarIcon: ({ color }) => <Ionicons name="home-outline" size={20} color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="empty-legs"
-        options={{
-          title: 'EMPTY',
-          tabBarIcon: ({ color }) => <Ionicons name="airplane-outline" size={20} color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="charters"
-        options={{
-          title: 'CHARTER',
-          tabBarIcon: ({ color }) => <Ionicons name="star-outline" size={20} color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="membresias"
-        options={{
-          title: 'PLANES',
-          tabBarIcon: ({ color }) => <Ionicons name="briefcase-outline" size={20} color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="quienes"
-        options={{
-          title: 'QUIÉNES',
-          tabBarIcon: ({ color }) => <Ionicons name="person-outline" size={20} color={color} />,
-        }}
-      />
+      <Tabs.Screen name="home" options={{ title: 'HOME', tabBarIcon: ({ color }) => <Ionicons name="home-outline" size={20} color={color} /> }} />
+      <Tabs.Screen name="empty-legs" options={{ title: 'EMPTY', tabBarIcon: ({ color }) => <Ionicons name="airplane-outline" size={20} color={color} /> }} />
+      <Tabs.Screen name="charters" options={{ title: 'CHARTER', tabBarIcon: ({ color }) => <Ionicons name="star-outline" size={20} color={color} /> }} />
+      <Tabs.Screen name="membresias" options={{ title: 'PLANES', tabBarIcon: ({ color }) => <Ionicons name="briefcase-outline" size={20} color={color} /> }} />
+      <Tabs.Screen name="quienes" options={{ title: 'QUIÉNES', tabBarIcon: ({ color }) => <Ionicons name="person-outline" size={20} color={color} /> }} />
       <Tabs.Screen name="viajes" options={{ href: null }} />
       <Tabs.Screen name="perfil" options={{ href: null }} />
+      <Tabs.Screen name="flota" options={{ href: null }} />
       <Tabs.Screen name="index" options={{ href: null }} />
     </Tabs>
   );

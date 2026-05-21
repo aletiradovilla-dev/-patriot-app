@@ -65,7 +65,7 @@ export default function QuienesSomosScreen() {
             />
             <View style={{ flex: 1 }}>
               <Text style={styles.leaderName}>Juan Pablo Morales</Text>
-              <Text style={styles.leaderTitle}>Founder & CEO</Text>
+              <Text style={styles.leaderTitle}>FOUNDER & CEO</Text>
               <Text style={styles.leaderBio}>
                 Experiencia técnica con servicio genuino y discreto. Nos anticipamos a las necesidades de cada pasajero.
               </Text>

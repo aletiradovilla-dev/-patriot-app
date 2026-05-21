@@ -1,8 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { Linking, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useProfile } from '../../hooks/useProfile';
 
-const WHATSAPP_NUMBER = '5215500000000';
+const WHATSAPP_NUMBER = '527225592758';
 
 const beneficiosBlue = [
   'Acceso ilimitado a Empty Legs nacionales',
@@ -20,13 +21,13 @@ const beneficiosBlack = [
   'Tarifas preferenciales en vuelos compartidos',
 ];
 
-function PlanCard({ plan }: { plan: 'blue' | 'black' }) {
+function PlanCard({ plan, profile }: { plan: 'blue' | 'black'; profile: any }) {
   const isBlack = plan === 'black';
 
   const handleWhatsApp = () => {
     const msg = isBlack
-      ? 'Hola, me interesa la membresía Patriot Black ($22,000 MXN/mes). ¿Me pueden dar más información?'
-      : 'Hola, me interesa la membresía Patriot Blue ($9,900 MXN/mes). ¿Me pueden dar más información?';
+      ? `✈️ *Membresía Patriot Black - Patriot Aviation*\n\n*Cliente:* ${profile.nombre || 'No registrado'}\n*Email:* ${profile.email}\n*Teléfono:* ${profile.telefono || 'No registrado'}\n*Plan:* Patriot Black ($22,000 MXN/mes)\n\n_Me interesa este plan._`
+      : `✈️ *Membresía Patriot Blue - Patriot Aviation*\n\n*Cliente:* ${profile.nombre || 'No registrado'}\n*Email:* ${profile.email}\n*Teléfono:* ${profile.telefono || 'No registrado'}\n*Plan:* Patriot Blue ($9,900 MXN/mes)\n\n_Me interesa este plan._`;
     Linking.openURL(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`);
   };
 
@@ -92,6 +93,8 @@ function PlanCard({ plan }: { plan: 'blue' | 'black' }) {
 }
 
 export default function MembresiasScreen() {
+  const profile = useProfile();
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -104,15 +107,15 @@ export default function MembresiasScreen() {
 
       <ScrollView contentContainerStyle={styles.scroll}>
         <View style={styles.hero}>
-          <Text style={styles.heroTag}>ACCESO EXCLUSIVO</Text>
-          <Text style={styles.heroTitle}>Elige tu nivel{'\n'}de membresía</Text>
+          <Text style={styles.heroTag}>NUESTROS PLANES</Text>
+          <Text style={styles.heroTitle}>Descubre el plan{'\n'}hecho para ti</Text>
           <Text style={styles.heroCopy}>
-            Tarifas preferenciales · Prioridad en vuelos{'\n'}Cancela cuando quieras
+            Selecciona tu membresía ideal
           </Text>
         </View>
 
-        <PlanCard plan="blue" />
-        <PlanCard plan="black" />
+        <PlanCard plan="blue" profile={profile} />
+        <PlanCard plan="black" profile={profile} />
 
         <View style={{ height: 40 }} />
       </ScrollView>
@@ -166,10 +169,10 @@ const styles = StyleSheet.create({
   checkBox: { width: 18, height: 18, borderRadius: 5, alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 },
   checkBoxBlue: { backgroundColor: 'rgba(59,130,246,0.2)', borderWidth: 1, borderColor: 'rgba(59,130,246,0.4)' },
   checkBoxBlack: { backgroundColor: 'rgba(201,168,76,0.15)', borderWidth: 1, borderColor: 'rgba(201,168,76,0.3)' },
-  beneficioText: { fontSize: 13, color: 'rgba(255,255,255,0.75)', lineHeight: 20, flex: 1 },
+  beneficioText: { fontSize: 13, color: 'rgba(255,255,255,0.75)', lineHeight: 20, flex: 1, textAlign: 'left' },
   btn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, padding: 16, borderRadius: 14, marginTop: 24 },
-  btnBlue: { backgroundColor: '#1d4ed8' },
-  btnBlack: { backgroundColor: '#1a1200', borderWidth: 1, borderColor: '#C9A84C' },
+  btnBlue: { backgroundColor: '#128C7E' },
+  btnBlack: { backgroundColor: '#128C7E' },
   btnText: { color: '#fff', fontSize: 14, fontWeight: '600', letterSpacing: 0.5 },
   cancelNote: { textAlign: 'center', fontSize: 10, color: 'rgba(255,255,255,0.2)', marginTop: 10 },
 });

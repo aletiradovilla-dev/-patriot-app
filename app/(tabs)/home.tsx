@@ -21,7 +21,7 @@ export default function HomeScreen() {
     { label: 'Empty Legs', icon: 'airplane-outline', onPress: () => { setMenuOpen(false); router.push('/(tabs)/empty-legs'); } },
     { label: 'Charter Privado', icon: 'paper-plane-outline', onPress: () => { setMenuOpen(false); router.push('/(tabs)/charters'); } },
     { label: 'Mis Viajes', icon: 'briefcase-outline', onPress: () => { setMenuOpen(false); router.push('/(tabs)/viajes'); } },
-    { label: 'Nuestra Flota', icon: 'albums-outline', onPress: () => { setMenuOpen(false); } },
+    { label: 'Nuestra Flota', icon: 'albums-outline', onPress: () => { setMenuOpen(false); router.push('/(tabs)/flota'); } },
     { label: 'Membresías', icon: 'star-outline', onPress: () => { setMenuOpen(false); router.push('/(tabs)/membresias'); } },
     { label: 'Quiénes somos', icon: 'information-circle-outline', onPress: () => { setMenuOpen(false); router.push('/(tabs)/quienes'); } },
     { label: 'Mi Perfil', icon: 'person-outline', onPress: () => { setMenuOpen(false); router.push('/(tabs)/perfil'); } },

@@ -6,6 +6,9 @@ import {
   SafeAreaView, ScrollView, StyleSheet,
   Text, TextInput, TouchableOpacity, View
 } from 'react-native';
+import { useProfile } from '../../hooks/useProfile';
+
+const WHATSAPP = '527225592758';
 
 type Tramo = { origen: string; destino: string; fecha: Date | null };
 
@@ -15,6 +18,7 @@ export default function ChartersScreen() {
   const [activePicker, setActivePicker] = useState<number | null>(null);
   const [pax, setPax] = useState('1');
   const [notas, setNotas] = useState('');
+  const profile = useProfile();
 
   const formatDate = (date: Date) =>
     date.toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit', year: 'numeric' });
@@ -54,8 +58,8 @@ export default function ChartersScreen() {
     const tramosStr = tramos.map((t, i) =>
       `*Tramo ${i + 1}:* ${t.origen} → ${t.destino} · ${formatDate(t.fecha!)}`
     ).join('\n');
-    const msg = `✈️ *Solicitud de Charter - Patriot Aviation*\n\n*Tipo:* ${tipo}\n${tramosStr}\n*Pasajeros:* ${pax}\n*Notas:* ${notas || 'Ninguna'}\n\n_App Patriot Aviation_`;
-    Linking.openURL(`https://wa.me/527225592758?text=${encodeURIComponent(msg)}`);
+    const msg = `✈️ *Solicitud de Charter - Patriot Aviation*\n\n*Cliente:* ${profile.nombre || 'No registrado'}\n*Email:* ${profile.email}\n*Teléfono:* ${profile.telefono || 'No registrado'}\n*Tipo:* ${tipo}\n${tramosStr}\n*Pasajeros:* ${pax}\n*Notas:* ${notas || 'Ninguna'}\n\n_App Patriot Aviation_`;
+    Linking.openURL(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`);
   };
 
   return (
@@ -63,13 +67,11 @@ export default function ChartersScreen() {
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={styles.content}>
 
-          {/* HERO */}
           <Text style={styles.tag}>CHARTER PRIVADO</Text>
           <Text style={styles.title}>Cotiza tu vuelo</Text>
           <Text style={styles.sub}>Tu avión, tu ruta, tu horario.</Text>
           <View style={styles.divider} />
 
-          {/* TIPO DE VIAJE */}
           <Text style={styles.sectionTitle}>Tipo de viaje</Text>
           <View style={styles.tipoRow}>
             {(['ida', 'redondo', 'multidestino'] as const).map((tipo) => (
@@ -86,7 +88,6 @@ export default function ChartersScreen() {
           </View>
           <View style={styles.divider} />
 
-          {/* RUTA */}
           <Text style={styles.sectionTitle}>Ruta</Text>
           {tramos.map((tramo, i) => (
             <View key={i} style={styles.tramoBox}>
@@ -98,21 +99,9 @@ export default function ChartersScreen() {
                 </Text>
               )}
               <Text style={styles.label}>Origen</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Ciudad de origen"
-                placeholderTextColor="#444"
-                value={tramo.origen}
-                onChangeText={(v) => updateTramo(i, 'origen', v)}
-              />
+              <TextInput style={styles.input} placeholder="Ciudad de origen" placeholderTextColor="#444" value={tramo.origen} onChangeText={(v) => updateTramo(i, 'origen', v)} />
               <Text style={styles.label}>Destino</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Ciudad de destino"
-                placeholderTextColor="#444"
-                value={tramo.destino}
-                onChangeText={(v) => updateTramo(i, 'destino', v)}
-              />
+              <TextInput style={styles.input} placeholder="Ciudad de destino" placeholderTextColor="#444" value={tramo.destino} onChangeText={(v) => updateTramo(i, 'destino', v)} />
               <Text style={styles.label}>Fecha</Text>
               <TouchableOpacity style={styles.dateInput} onPress={() => setActivePicker(i)}>
                 <Text style={tramo.fecha ? styles.dateText : styles.datePlaceholder}>
@@ -135,7 +124,6 @@ export default function ChartersScreen() {
             </View>
           ))}
 
-          {/* AGREGAR TRAMO */}
           {tipoViaje === 'multidestino' && tramos.length < 5 && (
             <TouchableOpacity style={styles.addTramoBtn} onPress={addTramo}>
               <Ionicons name="add-circle-outline" size={18} color="#C9A84C" />
@@ -143,29 +131,14 @@ export default function ChartersScreen() {
             </TouchableOpacity>
           )}
 
-
-{/* DETALLES */}
           <View style={{ height: 20 }} />
+          <View style={styles.divider} />
+
           <Text style={styles.sectionTitle}>Detalles</Text>
           <Text style={styles.label}>Pasajeros</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="1"
-            placeholderTextColor="#444"
-            value={pax}
-            onChangeText={setPax}
-            keyboardType="number-pad"
-          />
+          <TextInput style={styles.input} placeholder="1" placeholderTextColor="#444" value={pax} onChangeText={setPax} keyboardType="number-pad" />
           <Text style={styles.label}>Notas adicionales</Text>
-          <TextInput
-            style={[styles.input, styles.textarea]}
-            placeholder="Requerimientos especiales..."
-            placeholderTextColor="#444"
-            value={notas}
-            onChangeText={setNotas}
-            multiline
-            numberOfLines={3}
-          />
+          <TextInput style={[styles.input, styles.textarea]} placeholder="Requerimientos especiales..." placeholderTextColor="#444" value={notas} onChangeText={setNotas} multiline numberOfLines={3} />
 
           <View style={styles.divider} />
 
