@@ -115,7 +115,7 @@ export default function FlotaScreen() {
 
       <View style={styles.heroSection}>
         <Text style={styles.heroTag}>FLOTA PATRIOT</Text>
-        <Text style={styles.heroTitle}>Aeronaves de <Text style={styles.heroGold}>alto rendimiento</Text></Text>
+        <Text style={styles.heroTitle}>Selección de <Text style={styles.heroGold}>aeronaves</Text></Text>
       </View>
       <View style={styles.divider} />
 
