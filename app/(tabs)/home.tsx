@@ -1,8 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import {
-  Linking, Modal, SafeAreaView, ScrollView,
+  ImageBackground, Linking, Modal, SafeAreaView, ScrollView,
   StyleSheet, Text, TouchableOpacity, View
 } from 'react-native';
 import { supabase } from '../../lib/supabase';
@@ -24,6 +25,7 @@ export default function HomeScreen() {
     { label: 'Nuestra Flota', icon: 'albums-outline', onPress: () => { setMenuOpen(false); router.push('/(tabs)/flota'); } },
     { label: 'Membresías', icon: 'star-outline', onPress: () => { setMenuOpen(false); router.push('/(tabs)/membresias'); } },
     { label: 'Quiénes somos', icon: 'information-circle-outline', onPress: () => { setMenuOpen(false); router.push('/(tabs)/quienes'); } },
+    { label: 'Aviso de Privacidad', icon: 'shield-checkmark-outline', onPress: () => { setMenuOpen(false); Linking.openURL('https://patriot-admin.vercel.app/privacidad'); } },
     { label: 'Mi Perfil', icon: 'person-outline', onPress: () => { setMenuOpen(false); router.push('/(tabs)/perfil'); } },
   ];
 
@@ -57,41 +59,50 @@ export default function HomeScreen() {
       </Modal>
 
       <ScrollView>
-        {/* HEADER */}
-        <View style={styles.header}>
-          <View>
-            <Text style={styles.logo}>Patriot</Text>
-            <Text style={styles.logoSub}>AVIATION</Text>
-          </View>
-          <View style={styles.headerRight}>
-            <TouchableOpacity
-              onPress={() => Linking.openURL('https://www.instagram.com/patriot.aviation')}
-              style={styles.igBtn}
-            >
-              <Ionicons name="logo-instagram" size={22} color="#C9A84C" />
-            </TouchableOpacity>
-            <View style={styles.separator} />
-            <TouchableOpacity onPress={() => setMenuOpen(true)} style={styles.hamburger}>
-              <View style={styles.bar} />
-              <View style={styles.bar} />
-              <View style={styles.bar} />
-            </TouchableOpacity>
-          </View>
-        </View>
+        {/* HERO CON FOTO */}
+        <ImageBackground
+          source={require('../../assets/images/login-bg.png')}
+          style={styles.heroBg}
+          resizeMode="cover"
+        >
+          {/* CAPA OSCURA — cambia 0.5 para más/menos oscuro */}
+          <View style={styles.darkOverlay} />
 
-        {/* LÍNEA DORADA 1 */}
-        <View style={styles.dividerGold} />
+          <LinearGradient
+            colors={['transparent', 'rgba(13,27,42,0.6)', '#0D1B2A']}
+            style={styles.heroGradient}
+          >
+            {/* HEADER */}
+            <View style={styles.header}>
+              <View>
+                <Text style={styles.logo}>Patriot</Text>
+                <Text style={styles.logoSub}>AVIATION</Text>
+              </View>
+              <View style={styles.headerRight}>
+                <TouchableOpacity
+                  onPress={() => Linking.openURL('https://www.instagram.com/patriot.aviation')}
+                  style={styles.igBtn}
+                >
+                  <Ionicons name="logo-instagram" size={22} color="#C9A84C" />
+                </TouchableOpacity>
+                <View style={styles.separator} />
+                <TouchableOpacity onPress={() => setMenuOpen(true)} style={styles.hamburger}>
+                  <View style={styles.bar} />
+                  <View style={styles.bar} />
+                  <View style={styles.bar} />
+                </TouchableOpacity>
+              </View>
+            </View>
 
-        {/* HERO */}
-        <View style={styles.hero}>
-          <Text style={styles.heroSub}>BIENVENIDO</Text>
-          <Text style={styles.heroTitle}>Selecciona tu</Text>
-          <Text style={styles.heroItalic}>forma de volar</Text>
-          <Text style={styles.heroCopy}>Experiencia ejecutiva de primer nivel · Toluca</Text>
-        </View>
-
-        {/* LÍNEA DORADA 2 */}
-        <View style={styles.dividerGold} />
+            {/* HERO TEXT */}
+            <View style={styles.heroText}>
+              <Text style={styles.heroSub}>BIENVENIDO</Text>
+              <Text style={styles.heroTitle}>Selecciona tu</Text>
+              <Text style={styles.heroItalic}>forma de volar</Text>
+              <Text style={styles.heroCopy}>Experiencia ejecutiva de primer nivel · Toluca</Text>
+            </View>
+          </LinearGradient>
+        </ImageBackground>
 
         {/* CARDS */}
         <View style={styles.cards}>
@@ -120,10 +131,13 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#0D1B2A' },
-  header: {
-    paddingHorizontal: 24, paddingTop: 20, paddingBottom: 14,
-    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+  heroBg: { width: '100%' },
+  darkOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.74)', // <- cambia este número para oscurecer
   },
+  heroGradient: { paddingBottom: 32 },
+  header: { paddingHorizontal: 24, paddingTop: 20, paddingBottom: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   logo: { fontSize: 28, color: '#fff', fontWeight: '300', letterSpacing: 4 },
   logoSub: { fontSize: 10, color: '#C9A84C', letterSpacing: 6 },
   headerRight: { flexDirection: 'row', alignItems: 'center', gap: 4 },
@@ -131,12 +145,11 @@ const styles = StyleSheet.create({
   separator: { width: 1, height: 20, backgroundColor: 'rgba(201,168,76,0.4)', marginHorizontal: 4 },
   hamburger: { padding: 8, justifyContent: 'center' },
   bar: { width: 22, height: 2, backgroundColor: '#C9A84C', borderRadius: 2, marginVertical: 2 },
-  dividerGold: { height: 1, backgroundColor: 'rgba(201,168,76,0.25)', marginHorizontal: 24 },
-  hero: { paddingHorizontal: 24, paddingVertical: 32 },
+  heroText: { paddingHorizontal: 24, paddingTop: 40, paddingBottom: 16 },
   heroSub: { fontSize: 10, color: '#C9A84C', letterSpacing: 4, marginBottom: 8 },
   heroTitle: { fontSize: 40, color: '#fff', fontWeight: '300' },
   heroItalic: { fontSize: 40, color: '#C9A84C', fontStyle: 'italic', fontWeight: '300', marginTop: -8 },
-  heroCopy: { fontSize: 12, color: 'rgba(255,255,255,0.4)', marginTop: 12 },
+  heroCopy: { fontSize: 12, color: 'rgba(255,255,255,0.6)', marginTop: 12 },
   cards: { paddingHorizontal: 24, paddingTop: 24, gap: 12 },
   card: { backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1, borderColor: 'rgba(201,168,76,0.2)', borderRadius: 16, padding: 20 },
   cardTag: { fontSize: 9, color: '#C9A84C', letterSpacing: 3, marginBottom: 6 },

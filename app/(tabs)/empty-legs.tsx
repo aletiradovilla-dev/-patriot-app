@@ -109,17 +109,11 @@ export default function EmptyLegsScreen() {
                   </View>
                 </View>
                 <View style={styles.btnRow}>
-                  <TouchableOpacity
-                    style={styles.btnWA}
-                    onPress={() => handleWhatsApp(vuelo, 'asiento')}
-                  >
+                  <TouchableOpacity style={styles.btnWA} onPress={() => handleWhatsApp(vuelo, 'asiento')}>
                     <Ionicons name="logo-whatsapp" size={14} color="white" />
                     <Text style={styles.btnWAText}>Reservar asiento</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity
-                    style={[styles.btnWA, styles.btnWAGold]}
-                    onPress={() => handleWhatsApp(vuelo, 'cabina')}
-                  >
+                  <TouchableOpacity style={[styles.btnWA, styles.btnWAGold]} onPress={() => handleWhatsApp(vuelo, 'cabina')}>
                     <Ionicons name="logo-whatsapp" size={14} color="#1B2A4A" />
                     <Text style={[styles.btnWAText, { color: '#1B2A4A' }]}>Cabina completa</Text>
                   </TouchableOpacity>
