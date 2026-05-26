@@ -25,12 +25,13 @@ export default function HomeScreen() {
     { label: 'Nuestra Flota', icon: 'albums-outline', onPress: () => { setMenuOpen(false); router.push('/(tabs)/flota'); } },
     { label: 'Membresías', icon: 'star-outline', onPress: () => { setMenuOpen(false); router.push('/(tabs)/membresias'); } },
     { label: 'Quiénes somos', icon: 'information-circle-outline', onPress: () => { setMenuOpen(false); router.push('/(tabs)/quienes'); } },
-    { label: 'Aviso de Privacidad', icon: 'shield-checkmark-outline', onPress: () => { setMenuOpen(false); Linking.openURL('https://patriot-admin.vercel.app/privacidad'); } },
     { label: 'Mi Perfil', icon: 'person-outline', onPress: () => { setMenuOpen(false); router.push('/(tabs)/perfil'); } },
   ];
 
   return (
     <SafeAreaView style={styles.container}>
+
+      {/* MENU HAMBURGUESA */}
       <Modal visible={menuOpen} transparent animationType="fade">
         <TouchableOpacity style={styles.overlay} onPress={() => setMenuOpen(false)} activeOpacity={1}>
           <View style={styles.sidebar}>
@@ -50,6 +51,12 @@ export default function HomeScreen() {
                 </TouchableOpacity>
               ))}
             </ScrollView>
+            <TouchableOpacity
+              style={styles.privacidadBtn}
+              onPress={() => { setMenuOpen(false); Linking.openURL('https://patriot-admin.vercel.app/privacidad'); }}
+            >
+              <Text style={styles.privacidadText}>Aviso de Privacidad</Text>
+            </TouchableOpacity>
             <TouchableOpacity style={styles.logoutMenuItem} onPress={handleLogout}>
               <Ionicons name="log-out-outline" size={16} color="rgba(255,255,255,0.25)" />
               <Text style={styles.logoutMenuText}>Cerrar sesión</Text>
@@ -58,21 +65,18 @@ export default function HomeScreen() {
         </TouchableOpacity>
       </Modal>
 
+      {/* CONTENIDO */}
       <ScrollView>
-        {/* HERO CON FOTO */}
         <ImageBackground
           source={require('../../assets/images/login-bg.png')}
           style={styles.heroBg}
           resizeMode="cover"
         >
-          {/* CAPA OSCURA — cambia 0.5 para más/menos oscuro */}
           <View style={styles.darkOverlay} />
-
           <LinearGradient
-            colors={['transparent', 'rgba(13,27,42,0.6)', '#0D1B2A']}
+            colors={['transparent', 'transparent', '#0D1B2A']}
             style={styles.heroGradient}
           >
-            {/* HEADER */}
             <View style={styles.header}>
               <View>
                 <Text style={styles.logo}>Patriot</Text>
@@ -93,8 +97,6 @@ export default function HomeScreen() {
                 </TouchableOpacity>
               </View>
             </View>
-
-            {/* HERO TEXT */}
             <View style={styles.heroText}>
               <Text style={styles.heroSub}>BIENVENIDO</Text>
               <Text style={styles.heroTitle}>Selecciona tu</Text>
@@ -104,7 +106,6 @@ export default function HomeScreen() {
           </LinearGradient>
         </ImageBackground>
 
-        {/* CARDS */}
         <View style={styles.cards}>
           <TouchableOpacity style={styles.card} onPress={() => router.push('/(tabs)/empty-legs')}>
             <Text style={styles.cardTag}>EMPTY LEGS</Text>
@@ -125,6 +126,7 @@ export default function HomeScreen() {
 
         <View style={{ height: 40 }} />
       </ScrollView>
+
     </SafeAreaView>
   );
 }
@@ -132,10 +134,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#0D1B2A' },
   heroBg: { width: '100%' },
-  darkOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.74)', // <- cambia este número para oscurecer
-  },
+  darkOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.5)' },
   heroGradient: { paddingBottom: 32 },
   header: { paddingHorizontal: 24, paddingTop: 20, paddingBottom: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   logo: { fontSize: 28, color: '#fff', fontWeight: '300', letterSpacing: 4 },
@@ -165,6 +164,8 @@ const styles = StyleSheet.create({
   menuList: { flex: 1 },
   menuItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 16, paddingHorizontal: 24, gap: 16, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.04)' },
   menuLabel: { fontSize: 15, color: 'rgba(255,255,255,0.8)', fontWeight: '300', letterSpacing: 1 },
-  logoutMenuItem: { padding: 24, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.06)', flexDirection: 'row', alignItems: 'center', gap: 8, justifyContent: 'center' },
+  privacidadBtn: { paddingVertical: 12, alignItems: 'center', borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.06)' },
+  privacidadText: { color: 'rgba(255,255,255,0.2)', fontSize: 10, letterSpacing: 1 },
+  logoutMenuItem: { padding: 20, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.06)', flexDirection: 'row', alignItems: 'center', gap: 8, justifyContent: 'center' },
   logoutMenuText: { color: 'rgba(255,255,255,0.25)', fontSize: 13 },
 });
