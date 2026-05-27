@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useFocusEffect } from 'expo-router';
+import { useCallback, useState } from 'react';
 import {
-    ActivityIndicator, SafeAreaView, ScrollView,
-    StyleSheet, Text, TouchableOpacity, View
+  ActivityIndicator, RefreshControl, SafeAreaView, ScrollView,
+  StyleSheet, Text, TouchableOpacity, View
 } from 'react-native';
 import { supabase } from '../../lib/supabase';
 
@@ -26,24 +27,32 @@ const estadoColor: Record<string, string> = {
 export default function ViajesScreen() {
   const [viajes, setViajes] = useState<Viaje[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [filtro, setFiltro] = useState('todos');
-
-  useEffect(() => {
-    fetchViajes();
-  }, []);
 
   const fetchViajes = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
-
     const { data } = await supabase
       .from('viajes')
       .select('*')
       .eq('usuario_id', user.id)
       .order('fecha', { ascending: false });
-
     if (data) setViajes(data);
     setLoading(false);
+    setRefreshing(false);
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      setLoading(true);
+      fetchViajes();
+    }, [])
+  );
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchViajes();
   };
 
   const filtrados = filtro === 'todos' ? viajes : viajes.filter(v => v.estado === filtro);
@@ -66,9 +75,17 @@ export default function ViajesScreen() {
       {loading ? (
         <ActivityIndicator color="#C9A84C" style={{ marginTop: 40 }} />
       ) : (
-        <ScrollView contentContainerStyle={styles.list}>
+        <ScrollView
+          contentContainerStyle={styles.list}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#C9A84C" />
+          }
+        >
           {filtrados.length === 0 ? (
-            <Text style={styles.empty}>No hay viajes</Text>
+            <View style={styles.emptyBox}>
+              <Text style={styles.empty}>No hay viajes</Text>
+              <Text style={styles.emptySub}>Desliza hacia abajo para actualizar</Text>
+            </View>
           ) : (
             filtrados.map(viaje => (
               <View key={viaje.id} style={styles.card}>
@@ -99,8 +116,10 @@ const styles = StyleSheet.create({
   filtroBtnActive: { backgroundColor: '#C9A84C', borderColor: '#C9A84C' },
   filtroText: { fontSize: 9, color: 'rgba(255,255,255,0.4)', letterSpacing: 1 },
   filtroTextActive: { color: '#1B2A4A', fontWeight: '700' },
-  list: { paddingHorizontal: 20, paddingBottom: 20 },
-  empty: { color: 'rgba(255,255,255,0.3)', textAlign: 'center', marginTop: 40, fontSize: 14 },
+  list: { paddingHorizontal: 20, paddingBottom: 40 },
+  emptyBox: { alignItems: 'center', marginTop: 60 },
+  empty: { color: 'rgba(255,255,255,0.3)', textAlign: 'center', fontSize: 14, marginBottom: 8 },
+  emptySub: { color: 'rgba(255,255,255,0.15)', textAlign: 'center', fontSize: 12 },
   card: { backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1, borderColor: 'rgba(201,168,76,0.15)', borderRadius: 14, padding: 16, marginBottom: 10 },
   cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 },
   ruta: { fontSize: 16, color: '#fff', fontWeight: '500' },
