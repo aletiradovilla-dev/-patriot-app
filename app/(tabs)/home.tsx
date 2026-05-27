@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
   menuList: { flex: 1 },
   menuItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 16, paddingHorizontal: 24, gap: 16, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.04)' },
   menuLabel: { fontSize: 15, color: 'rgba(255,255,255,0.8)', fontWeight: '300', letterSpacing: 1 },
-  privacidadBtn: { paddingVertical: 12, alignItems: 'center', borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.06)' },
+  privacidadBtn: { paddingVertical: 12, alignItems: 'center' },
   privacidadText: { color: 'rgba(255,255,255,0.2)', fontSize: 10, letterSpacing: 1 },
   logoutMenuItem: { padding: 20, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.06)', flexDirection: 'row', alignItems: 'center', gap: 8, justifyContent: 'center' },
   logoutMenuText: { color: 'rgba(255,255,255,0.25)', fontSize: 13 },

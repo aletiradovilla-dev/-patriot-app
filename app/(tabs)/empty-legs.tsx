@@ -3,7 +3,7 @@ import { useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 import {
   ActivityIndicator, Linking, RefreshControl, SafeAreaView, ScrollView,
-  StyleSheet, Text, TouchableOpacity, View
+  StyleSheet, Text, TextInput, TouchableOpacity, View
 } from 'react-native';
 import { useProfile } from '../../hooks/useProfile';
 import { supabase } from '../../lib/supabase';
@@ -27,6 +27,7 @@ export default function EmptyLegsScreen() {
   const [vuelos, setVuelos] = useState<EmptyLeg[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [busqueda, setBusqueda] = useState('');
   const profile = useProfile();
 
   const fetchVuelos = async () => {
@@ -52,6 +53,12 @@ export default function EmptyLegsScreen() {
     fetchVuelos();
   };
 
+  const filtrados = vuelos.filter(v =>
+    busqueda === '' ||
+    v.origen.toLowerCase().includes(busqueda.toLowerCase()) ||
+    v.destino.toLowerCase().includes(busqueda.toLowerCase())
+  );
+
   const handleWhatsApp = (vuelo: EmptyLeg, tipo: 'asiento' | 'cabina') => {
     const precio = tipo === 'asiento'
       ? `$${vuelo.precio_asiento.toLocaleString()} USD por asiento`
@@ -71,6 +78,24 @@ export default function EmptyLegsScreen() {
       </View>
       <View style={styles.divider} />
 
+      {/* BARRA DE BÚSQUEDA */}
+      <View style={styles.searchContainer}>
+        <Ionicons name="search-outline" size={16} color="rgba(255,255,255,0.3)" style={{ marginRight: 8 }} />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Buscar por ciudad..."
+          placeholderTextColor="rgba(255,255,255,0.3)"
+          value={busqueda}
+          onChangeText={setBusqueda}
+          autoCapitalize="none"
+        />
+        {busqueda.length > 0 && (
+          <TouchableOpacity onPress={() => setBusqueda('')}>
+            <Ionicons name="close-circle" size={16} color="rgba(255,255,255,0.3)" />
+          </TouchableOpacity>
+        )}
+      </View>
+
       {loading ? (
         <ActivityIndicator color="#C9A84C" style={{ marginTop: 40 }} />
       ) : (
@@ -80,14 +105,16 @@ export default function EmptyLegsScreen() {
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#C9A84C" />
           }
         >
-          {vuelos.length === 0 ? (
+          {filtrados.length === 0 ? (
             <View style={styles.emptyBox}>
               <Text style={styles.emptyIcon}>✈</Text>
-              <Text style={styles.emptyText}>No hay vuelos disponibles</Text>
+              <Text style={styles.emptyText}>
+                {busqueda ? `No hay vuelos a "${busqueda}"` : 'No hay vuelos disponibles'}
+              </Text>
               <Text style={styles.emptySub}>Desliza hacia abajo para actualizar</Text>
             </View>
           ) : (
-            vuelos.map((vuelo) => (
+            filtrados.map((vuelo) => (
               <View key={vuelo.id} style={styles.card}>
                 <View style={styles.ruta}>
                   <Text style={styles.ciudad}>{vuelo.origen}</Text>
@@ -133,11 +160,13 @@ const styles = StyleSheet.create({
   tag: { fontSize: 10, color: '#C9A84C', letterSpacing: 4, marginBottom: 4 },
   title: { fontSize: 28, color: '#fff', fontWeight: '300', marginBottom: 4 },
   sub: { fontSize: 13, color: 'rgba(255,255,255,0.3)' },
-  divider: { height: 1, backgroundColor: 'rgba(201,168,76,0.2)', marginHorizontal: 24, marginBottom: 20 },
+  divider: { height: 1, backgroundColor: 'rgba(201,168,76,0.2)', marginHorizontal: 24, marginBottom: 12 },
+  searchContainer: { flexDirection: 'row', alignItems: 'center', marginHorizontal: 20, marginBottom: 16, backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 10 },
+  searchInput: { flex: 1, color: '#fff', fontSize: 14 },
   list: { paddingHorizontal: 20, paddingBottom: 40 },
   emptyBox: { alignItems: 'center', marginTop: 60 },
   emptyIcon: { fontSize: 40, marginBottom: 16 },
-  emptyText: { color: 'rgba(255,255,255,0.5)', fontSize: 16, fontWeight: '500', marginBottom: 6 },
+  emptyText: { color: 'rgba(255,255,255,0.5)', fontSize: 16, fontWeight: '500', marginBottom: 6, textAlign: 'center' },
   emptySub: { color: 'rgba(255,255,255,0.25)', fontSize: 13 },
   card: { backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1, borderColor: 'rgba(201,168,76,0.2)', borderRadius: 16, padding: 20, marginBottom: 12 },
   ruta: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 10 },
