@@ -1,8 +1,8 @@
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useState } from 'react';
 import {
-  Alert, KeyboardAvoidingView, Linking, Platform,
+  Alert, AppState, KeyboardAvoidingView, Linking, Platform,
   SafeAreaView, ScrollView, StyleSheet,
   Text, TextInput, TouchableOpacity, View
 } from 'react-native';
@@ -19,6 +19,7 @@ export default function ChartersScreen() {
  const [pax, setPax] = useState('1');
  const [notas, setNotas] = useState('');
  const [tipoAvion, setTipoAvion] = useState('');
+ const [enviado, setEnviado] = useState(false);
  const profile = useProfile();
 
  const formatDate = (date: Date) =>
@@ -47,25 +48,35 @@ export default function ChartersScreen() {
    if (tramos.length < 5) setTramos([...tramos, { origen: '', destino: '', fecha: null }]);
  };
 
- const handleSolicitar = () => {
-   const valid = tramos.every(t => t.origen && t.destino && t.fecha);
-   if (!valid) {
-     Alert.alert('Error', 'Completa origen, destino y fecha de todos los tramos');
-     return;
-   }
-   const tipo = tipoViaje === 'ida' ? 'Solo ida' : tipoViaje === 'redondo' ? 'Ida y vuelta' : 'Multidestino';
-   const tramosStr = tramos.map((t, i) =>
-     `*Tramo ${i + 1}:* ${t.origen} -> ${t.destino} - ${formatDate(t.fecha!)}`
-   ).join('\n');
-   const msg = `Solicitud de Charter - Patriot Aviation\n\nCliente: ${profile.nombre || 'No registrado'}\nEmail: ${profile.email}\nTelefono: ${profile.telefono || 'No registrado'}\nTipo de viaje: ${tipo}\n${tramosStr}\nPasajeros: ${pax}\nTipo de avion: ${tipoAvion || 'Sin preferencia'}\nNotas: ${notas || 'Ninguna'}\n\nApp Patriot Aviation`;
-   Linking.openURL(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`);
- };
+  const handleSolicitar = () => {
+    const valid = tramos.every(t => t.origen && t.destino && t.fecha);
+    if (!valid) {
+      Alert.alert('Error', 'Completa origen, destino y fecha de todos los tramos');
+      return;
+    }
+    const tipo = tipoViaje === 'ida' ? 'Solo ida' : tipoViaje === 'redondo' ? 'Ida y vuelta' : 'Multidestino';
+    const tramosStr = tramos.map((t, i) =>
+      `*Tramo ${i + 1}:* ${t.origen} -> ${t.destino} - ${formatDate(t.fecha!)}`
+    ).join('\n');
+    const msg = `Solicitud de Charter - Patriot Aviation\n\nCliente: ${profile.nombre || 'No registrado'}\nEmail: ${profile.email}\nTelefono: ${profile.telefono || 'No registrado'}\nTipo de viaje: ${tipo}\n${tramosStr}\nPasajeros: ${pax}\nTipo de aeronave: ${tipoAvion || 'Sin preferencia'}\nNotas: ${notas || 'Ninguna'}\n\nApp Patriot Aviation`;
+
+    Linking.openURL(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`);
+
+    const subscription = AppState.addEventListener('change', (nextState) => {
+      if (nextState === 'active') {
+        setEnviado(true);
+        setTimeout(() => setEnviado(false), 5000);
+        subscription.remove();
+      }
+    });
+  };
+
 
  const aviones = [
-   { label: 'Light Jet', icon: 'airplane-outline' },
-   { label: 'Mid-Size', icon: 'airplane-outline' },
-   { label: 'Heavy Jet', icon: 'airplane-outline' },
-   { label: 'Helicoptero', icon: 'navigate-outline' },
+   { label: 'Light Jet', icon: 'airplane-outline', tipo: 'ionicon' },
+   { label: 'Mid-Size', icon: 'airplane-outline', tipo: 'ionicon' },
+   { label: 'Heavy Jet', icon: 'airplane-outline', tipo: 'ionicon' },
+   { label: 'Helicoptero', icon: 'helicopter', tipo: 'material' },
  ];
 
  return (
@@ -151,11 +162,19 @@ export default function ChartersScreen() {
                style={[styles.avionBtn, tipoAvion === a.label && styles.avionBtnActive]}
                onPress={() => setTipoAvion(tipoAvion === a.label ? '' : a.label)}
              >
-               <Ionicons
-                 name={a.icon as any}
-                 size={18}
-                 color={tipoAvion === a.label ? '#C9A84C' : 'rgba(255,255,255,0.3)'}
-               />
+               {a.tipo === 'material' ? (
+                 <MaterialCommunityIcons
+                   name={a.icon as any}
+                   size={18}
+                   color={tipoAvion === a.label ? '#C9A84C' : 'rgba(255,255,255,0.3)'}
+                 />
+               ) : (
+                 <Ionicons
+                   name={a.icon as any}
+                   size={18}
+                   color={tipoAvion === a.label ? '#C9A84C' : 'rgba(255,255,255,0.3)'}
+                 />
+               )}
                <Text style={[styles.avionBtnText, tipoAvion === a.label && styles.avionBtnTextActive]}>
                  {a.label}
                </Text>
@@ -167,6 +186,16 @@ export default function ChartersScreen() {
          <TextInput style={[styles.input, styles.textarea]} placeholder="Requerimientos especiales..." placeholderTextColor="rgba(255,255,255,0.2)" value={notas} onChangeText={setNotas} multiline numberOfLines={3} />
 
          <View style={styles.divider} />
+
+         {enviado && (
+           <View style={styles.confirmBox}>
+             <Ionicons name="checkmark-circle" size={28} color="#4CAF50" />
+             <View>
+               <Text style={styles.confirmTitle}>Solicitud enviada</Text>
+               <Text style={styles.confirmSub}>Te contactaremos pronto.</Text>
+             </View>
+           </View>
+         )}
 
          <TouchableOpacity style={styles.btn} onPress={handleSolicitar}>
            <Ionicons name="logo-whatsapp" size={20} color="white" />
@@ -208,6 +237,9 @@ const styles = StyleSheet.create({
  avionBtnActive: { backgroundColor: 'rgba(201,168,76,0.12)', borderColor: '#C9A84C' },
  avionBtnText: { fontSize: 13, color: 'rgba(255,255,255,0.35)', fontWeight: '500' },
  avionBtnTextActive: { color: '#C9A84C', fontWeight: '600' },
+ confirmBox: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: 'rgba(76,175,80,0.08)', borderWidth: 1, borderColor: 'rgba(76,175,80,0.25)', borderRadius: 12, padding: 16, marginBottom: 16 },
+ confirmTitle: { color: '#4CAF50', fontWeight: '600', fontSize: 14 },
+ confirmSub: { color: 'rgba(255,255,255,0.4)', fontSize: 12, marginTop: 2 },
  btn: { backgroundColor: '#128C7E', borderRadius: 14, padding: 18, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10 },
  btnText: { color: '#fff', fontWeight: '700', fontSize: 15 },
 });
