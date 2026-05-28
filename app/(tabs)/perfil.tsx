@@ -79,7 +79,9 @@ export default function PerfilScreen() {
         <Text style={styles.title}>Mi cuenta</Text>
 
         <View style={styles.avatar}>
-          <Text style={styles.avatarText}>{nombre ? nombre[0].toUpperCase() : email[0].toUpperCase()}</Text>
+          <Text style={styles.avatarText}>
+           {nombre ? nombre[0].toUpperCase() : ''}{nombre && nombre.includes(' ') ? nombre.split(' ')[1][0].toUpperCase() : ''}
+        </Text>
         </View>
 
         <View style={styles.form}>
