@@ -85,24 +85,28 @@ export default function LoginScreen() {
     }
   };
 
-  const handleForgot = async () => {
+const handleForgot = async () => {
     if (!email) {
       Alert.alert('Error', 'Ingresa tu correo electrónico');
       return;
     }
     setLoading(true);
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email);
-      if (error) Alert.alert('Error', error.message);
-      else Alert.alert('Correo enviado', 'Revisa tu bandeja para restablecer tu contraseña.', [
-        { text: 'OK', onPress: () => setModo('login') }
-      ]);
+      const { error } = await supabase.auth.resetPasswordForEmail(email.trim().toLowerCase());
+      if (error) {
+        Alert.alert('Error detalle', error.message + ' | ' + error.status + ' | ' + JSON.stringify(error));
+      } else {
+        Alert.alert('Correo enviado ✓', 'Revisa tu bandeja y spam.',
+          [{ text: 'OK', onPress: () => setModo('login') }]
+        );
+      }
     } catch (e: any) {
-      Alert.alert('Error', e.message);
+      Alert.alert('Error catch', JSON.stringify(e));
     } finally {
       setLoading(false);
     }
   };
+
 
   return (
     <ImageBackground

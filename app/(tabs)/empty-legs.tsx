@@ -2,8 +2,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 import {
- ActivityIndicator, Linking, RefreshControl, SafeAreaView, ScrollView,
- StyleSheet, Text, TextInput, TouchableOpacity, View
+  ActivityIndicator, Linking, RefreshControl, SafeAreaView, ScrollView,
+  StyleSheet, Text, TextInput, TouchableOpacity, View
 } from 'react-native';
 import { useProfile } from '../../hooks/useProfile';
 import { supabase } from '../../lib/supabase';
@@ -64,9 +64,9 @@ export default function EmptyLegsScreen() {
      ? `$${vuelo.precio_asiento.toLocaleString()} USD por asiento`
      : `$${vuelo.precio_cabina.toLocaleString()} USD cabina completa`;
 
-   const msg = `Reserva de Empty Leg - Patriot Aviation\n\nCliente: ${profile.nombre || 'No registrado'}\nEmail: ${profile.email}\nTelefono: ${profile.telefono || 'No registrado'}\nRuta: ${vuelo.origen} - ${vuelo.destino}\nFecha: ${vuelo.fecha}\nHora: ${vuelo.hora}\nAeronave: ${vuelo.aeronave}\nAsientos disponibles: ${vuelo.asientos}\nOpcion: ${precio}\n\nApp Patriot Aviation`;
+  const msg = `*Reserva de Empty Leg - Patriot Aviation*\n\n*Cliente:* ${profile.nombre || 'No registrado'}\n*Email:* ${profile.email}\n*Telefono:* ${profile.telefono || 'No registrado'}\n*Ruta:* ${vuelo.origen} → ${vuelo.destino}\n*Fecha:* ${vuelo.fecha}\n*Hora:* ${vuelo.hora}\n*Aeronave:* ${vuelo.aeronave}\n*Asientos disponibles:* ${vuelo.asientos}\n*Opcion:* ${precio}\n\n_App Patriot Aviation_`;
 
-   Linking.openURL(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`);
+  Linking.openURL(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`);
  };
 
  return (
